@@ -1,0 +1,16 @@
+init:
+
+Raw:
+  output_directory: 'bcube_demo/raw'
+    
+Identify:
+  identifiers:
+    - lib/configs/opensearch_identifier.yaml
+
+  output_directory: 'bcube_demo/identified'
+
+Parse:
+  output_directory: 'bcube_demo/parsed'
+
+Triple:
+  output_directory: 'bcube_demo/triples'
