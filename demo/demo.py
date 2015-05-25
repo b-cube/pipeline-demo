@@ -6,6 +6,7 @@ from flask import abort
 app = Flask(__name__)
 
 import luigi
+import os
 from bcube_demo_pipeline import MainWorkflow
 from dlib.task_helpers import clear_directory
 from dlib.call_solr import pull_from_solr
@@ -37,8 +38,8 @@ def reset():
     '''
     dirs = ['docs', 'raw', 'identified', 'parsed', 'triples']
     for d in dirs:
-        clear_directory(d)
-    return
+        clear_directory(os.path.join('bcube_demo', d))
+    return ''
 
 if __name__ == "__main__":
     app.run(debug=True)
