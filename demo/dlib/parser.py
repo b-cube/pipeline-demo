@@ -2,7 +2,7 @@ from lxml import etree
 from HTMLParser import HTMLParser
 from bs4 import BeautifulSoup
 import re
-from lib.utils import unquote
+from utils import unquote
 
 
 class BasicParser():

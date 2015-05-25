@@ -1,7 +1,7 @@
 from lxml import etree
 
-from lib.parser import Parser
-from lib.utils import tidy_dict
+from parser import Parser
+from utils import tidy_dict
 
 '''
 strip out some identified set of elements for the

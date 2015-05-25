@@ -1,5 +1,5 @@
-from lib.opensearch_preprocessors import OpenSearchReader
-from lib.xml_preprocessors import XmlReader
+from opensearch_preprocessors import OpenSearchReader
+from xml_preprocessors import XmlReader
 
 
 class Processor():
