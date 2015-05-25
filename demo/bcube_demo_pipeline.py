@@ -2,11 +2,11 @@ import json
 import glob
 import luigi
 import os
-from task_helpers import parse_yaml, extract_task_config
-from task_helpers import read_data, generate_output_filename, run_init
-from identifier import Identify
-from parser import Parser
-from process_router import Processor
+from dlib.task_helpers import parse_yaml, extract_task_config
+from dlib.task_helpers import read_data, generate_output_filename, run_init
+from dlib.identifier import Identify
+from dlib.parser import Parser
+from dlib.process_router import Processor
 
 
 '''
@@ -113,14 +113,14 @@ class IdentifyTask(luigi.Task):
         url = data.get('url', '')
         parser = Parser(content)
 
-        identify = Identify(
+        identifier = Identify(
             self.identifiers,
             content,
             url,
             **{'parser': parser, 'ignore_case': True}
         )
-        identify.identify()
-        data['identity'] = identify.to_json()
+        identifier.identify()
+        data['identity'] = identifier.to_json()
         return data
 
 

@@ -1,11 +1,10 @@
-import luigi
-from dlib.bcube_demo_pipeline import MainWorkflow
 import requests
 import json
 import hashlib
+import os
 
 
-def pull_from_solr():
+def pull_from_solr(output_directory):
     solr_url = 'http://54.191.81.42:8888/solr/collection1/select?q=*%3A*&wt=json&indent=true'
 
     # TODO: ask about auth for this
@@ -21,11 +20,5 @@ def pull_from_solr():
         doc_sha = hashlib.sha224(doc_url).hexdigest()
         doc.update({"sha": doc_sha})
 
-        with open('bcube_demo/docs/%s.json' % doc_sha, 'w') as f:
+        with open(os.path.join(output_directory, '%s.json' % doc_sha), 'w') as f:
             f.write(json.dumps(doc, indent=4))
-
-
-if __name__ == '__main__':
-    pull_from_solr()
-    w = MainWorkflow(doc_dir='bcube_demo/docs', yaml_file='configs/bcube_demo.yaml')
-    luigi.build([w], local_scheduler=True)

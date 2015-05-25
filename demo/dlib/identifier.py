@@ -25,9 +25,6 @@ class Identify():
         self.source_url = source_url
         self.options = options
         self.yaml = import_yaml_configs(self.yaml_files)
-
-        print '#####IMPORTED YAML: ', self.yaml
-
         self.ignore_case = options['ignore_case'] if 'ignore_case' in options else False
 
     def _filter(self, operator, filters, clauses):
