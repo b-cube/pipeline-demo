@@ -22,8 +22,11 @@ def trigger_pipeline():
     '''
     doc_dir = 'bcube_demo/docs'
 
-    std = sys.stderr
+    # capture the main luigi output
+    ste = sys.stderr
     sys.stderr = pipeline_output = StringIO.StringIO()
+    std = sys.stdout
+    sys.stdout = pipeline_debug = StringIO.StringIO()
 
     pull_from_solr(doc_dir)
     task = MainWorkflow(doc_dir=doc_dir, yaml_file='configs/bcube_demo.yaml')
@@ -33,13 +36,21 @@ def trigger_pipeline():
     w.add(task)
     w.run()
 
+    # store and reset
     piped = pipeline_output.getvalue()
-    sys.stderr = std
+    sys.stderr = ste
+
+    debugs = pipeline_debug.getvalue()
+    sys.stdout = std
 
     # fake the generator
     def generate():
         for pipe in piped.split('\n'):
             yield pipe + '\n'
+        yield '\n\n####################\n\n'
+
+        for debug in debugs.split('\n'):
+            yield debug + '\n'
 
     return Response(generate(), mimetype='text/plain')
 
