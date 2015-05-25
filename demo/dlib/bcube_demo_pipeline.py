@@ -38,6 +38,8 @@ class RawTask(luigi.Task):
 
     def run(self):
         ''' '''
+        self._configure()
+
         data = read_data(self.input_file)
         new_data = self.process_response(data)
 
@@ -53,8 +55,9 @@ class RawTask(luigi.Task):
         content = content.replace('\\n', ' ').replace('\\t', ' ')
         content = content.replace('\\\\ufffd', ' ').replace('\\ufffd', ' ')
         content = ' '.join(content.split())
+        content = content.strip()
 
-        url = data.get('source_url', '')
+        url = data.get('url', '')
         sha = data.get('sha', '')
         harvest = data.get('tstamp', '')
         return {
@@ -90,6 +93,8 @@ class IdentifyTask(luigi.Task):
 
     def run(self):
         ''' '''
+        self._configure()
+
         data = read_data(self.input_file)
         new_data = self.process_response(data)
 
@@ -139,6 +144,8 @@ class ParseTask(luigi.Task):
 
     def run(self):
         ''' '''
+        self._configure()
+
         data = read_data(self.input_file)
         new_data = self.process_response(data)
 
@@ -189,6 +196,8 @@ class TripleTask(luigi.Task):
 
     def run(self):
         ''' '''
+        self._configure()
+
         data = read_data(self.input_file)
         new_data = self.process_response(data)
 

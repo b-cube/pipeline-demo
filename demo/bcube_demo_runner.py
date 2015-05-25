@@ -1,5 +1,5 @@
 import luigi
-from bcube_demo_pipeline import MainWorkflow
+from dlib.bcube_demo_pipeline import MainWorkflow
 import requests
 import json
 import hashlib
@@ -27,5 +27,5 @@ def pull_from_solr():
 
 if __name__ == '__main__':
     pull_from_solr()
-    w = MainWorkflow(doc_dir='bcube_demo/docs', yaml_file='bcube_demo.yaml')
+    w = MainWorkflow(doc_dir='bcube_demo/docs', yaml_file='configs/bcube_demo.yaml')
     luigi.build([w], local_scheduler=True)

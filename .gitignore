@@ -60,3 +60,6 @@ target/
 
 # pipeline outputs
 demo/bcube_demo/
+bcube_demo/
+
+*.ipynb
