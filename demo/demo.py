@@ -2,7 +2,7 @@
 
 import flask
 from flask import Flask
-from flask import abort
+from flask import Response
 app = Flask(__name__)
 
 import luigi
@@ -10,6 +10,9 @@ import os
 from bcube_demo_pipeline import MainWorkflow
 from dlib.task_helpers import clear_directory
 from dlib.call_solr import pull_from_solr
+
+import sys
+import StringIO
 
 
 @app.route('/pipe')
@@ -19,6 +22,9 @@ def trigger_pipeline():
     '''
     doc_dir = 'bcube_demo/docs'
 
+    std = sys.stderr
+    sys.stderr = pipeline_output = StringIO.StringIO()
+
     pull_from_solr(doc_dir)
     task = MainWorkflow(doc_dir=doc_dir, yaml_file='configs/bcube_demo.yaml')
     luigi.interface.setup_interface_logging()
@@ -27,7 +33,15 @@ def trigger_pipeline():
     w.add(task)
     w.run()
 
-    return ''
+    piped = pipeline_output.getvalue()
+    sys.stderr = std
+
+    # fake the generator
+    def generate():
+        for pipe in piped.split('\n'):
+            yield pipe + '\n'
+
+    return Response(generate(), mimetype='text/plain')
 
 
 @app.route('/reset')
