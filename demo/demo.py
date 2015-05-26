@@ -7,6 +7,7 @@ from flask import request
 app = Flask(__name__)
 
 import luigi
+from luigi import worker
 import os
 from bcube_demo_pipeline import MainWorkflow
 from dlib.task_helpers import clear_directory
@@ -37,7 +38,7 @@ def trigger_pipeline():
     task = MainWorkflow(doc_dir=doc_dir, yaml_file='configs/bcube_demo.yaml')
     luigi.interface.setup_interface_logging()
     sch = luigi.scheduler.CentralPlannerScheduler()
-    w = luigi.worker.Worker(scheduler=sch)
+    w = worker.Worker(scheduler=sch)
     w.add(task)
     w.run()
 
