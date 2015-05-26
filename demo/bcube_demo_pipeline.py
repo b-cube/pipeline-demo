@@ -95,7 +95,8 @@ class IdentifyTask(luigi.Task):
         ''' '''
         self._configure()
 
-        data = read_data(self.input_file)
+        f = self.input().open('r')
+        data = json.loads(f.read())
         new_data = self.process_response(data)
 
         with self.output().open('w') as out_file:
@@ -146,7 +147,8 @@ class ParseTask(luigi.Task):
         ''' '''
         self._configure()
 
-        data = read_data(self.input_file)
+        f = self.input().open('r')
+        data = json.loads(f.read())
         new_data = self.process_response(data)
 
         with self.output().open('w') as out_file:
@@ -198,7 +200,8 @@ class TripleTask(luigi.Task):
         ''' '''
         self._configure()
 
-        data = read_data(self.input_file)
+        f = self.input().open('r')
+        data = json.loads(f.read())
         new_data = self.process_response(data)
 
         with self.output().open('w') as out_file:
