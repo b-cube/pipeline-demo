@@ -164,8 +164,11 @@ class Triplelizer():
 
             endpoint.add(wso["Protocol"], Literal(item.protocol))
             endpoint.add(wso["BaseURL"], URIRef(self._escape_rdflib(item.url)))
-            for mime_type in item.mimeType:
-                endpoint.add(media['type'], Literal(mime_type))
+            try:
+                for mime_type in item.mimeType:
+                    endpoint.add(media['type'], Literal(mime_type))
+            except AttributeError:
+                pass
             if doc.identity.subtype == "service":
                 endpoint.add(RDF.type, wso["ServiceEndpoint"])
                 endpoint.add(wso["hasService"], service)
@@ -204,6 +207,8 @@ class Triplelizer():
 
             resource = self.store.get_resource(document_urn)
 
+            print doc_type, doc_ontology
+
             resource.add(RDF.type, URIRef(doc_type))
             resource.add(RDF.type, wso[doc_ontology])
             resource.add(DCTERMS.hasVersion, Literal(doc_version))
@@ -223,29 +228,29 @@ class Triplelizer():
             return None
 
 
-class JsonLoader():
-    '''
-    '''
-    def __init__(self, path):
-        self.path = path
+# class JsonLoader():
+#     '''
+#     '''
+#     def __init__(self, path):
+#         self.path = path
 
-    def load(self):
-        # generator for the files (whether path or not)
-        if os.path.isdir(self.path):
-            files = glob.glob(os.path.join(self.path, '*.json'))
-            for f in files:
-                yield f
-        elif os.path.isfile(self.path):
-            yield self.path
+#     def load(self):
+#         # generator for the files (whether path or not)
+#         if os.path.isdir(self.path):
+#             files = glob.glob(os.path.join(self.path, '*.json'))
+#             for f in files:
+#                 yield f
+#         elif os.path.isfile(self.path):
+#             yield self.path
 
-    def parse(self, j_file):
-        try:
-            with open(j_file) as json_file:
-                data = json.load(json_file)
-                return bunchify(data)
-        except:
-            # logger.error(" Loading: " + j_file)
-            return None
+#     def parse(self, j_file):
+#         try:
+#             with open(j_file) as json_file:
+#                 data = json.load(json_file)
+#                 return bunchify(data)
+#         except:
+#             # logger.error(" Loading: " + j_file)
+#             return None
 
 
 def triplify(json_data, sparql_store):

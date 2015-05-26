@@ -215,7 +215,7 @@ class TripleTask(luigi.Task):
         self.params = config.get('params', {})
 
     def process_response(self, data):
-        graph = triplify(data, '')
+        graph = triplify(data, None)
         if graph is not None:
             graph = serialize(graph)
         return graph
