@@ -152,11 +152,10 @@ class Triplelizer():
 
             endpoint.add(wso["Protocol"], Literal(item.protocol))
             endpoint.add(wso["BaseURL"], URIRef(self._escape_rdflib(item.url)))
-            try:
+            if 'mimeType' in item:
                 for mime_type in item.mimeType:
                     endpoint.add(media['type'], Literal(mime_type))
-            except AttributeError:
-                pass
+
             if doc.identity.subtype == "service":
                 endpoint.add(RDF.type, wso["ServiceEndpoint"])
                 endpoint.add(wso["hasService"], service)
