@@ -12,9 +12,11 @@ import os
 from bcube_demo_pipeline import MainWorkflow
 from dlib.task_helpers import clear_directory
 from dlib.call_solr import pull_from_solr
+from dlib.btriples import storify
 
 import sys
 import StringIO
+import glob
 
 
 @app.route('/pipe')
@@ -70,10 +72,15 @@ def reset():
     reset the pipeline (delete the intermediate files)
     TODO: drop from parliament?!
     '''
+    # TODO: remove the TRIPLES acting on EACH file first.
+    endpoint = 'http://54.69.87.196:8080/parliament/sparql'
+    for ttl in glob.glob(os.path.join('bcube_demo', 'triples', '*.ttl')):
+        storify(endpoint, triples_path=ttl, option='DELETE')
+
     dirs = ['docs', 'raw', 'identified', 'parsed', 'triples']
     for d in dirs:
         clear_directory(os.path.join('bcube_demo', d))
-    return ''
+    return 'Pipeline reset!'
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8080, debug=True)

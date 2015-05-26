@@ -9,19 +9,14 @@ import json
 from uuid import uuid4
 
 
-class Store():
+class LocalStore():
     '''
     This class is a wrapper for the Graph class that
     handles ontology binding and triples serialization.
     '''
 
-    def __init__(self, endpoint=None):
-        if endpoint is None:
-            self.g = Graph()
-        else:
-            self._store = sparqlstore.SPARQLUpdateStore()
-            self._store.open((endpoint, endpoint))
-            self.g = Graph(self._store, URIRef('urn:x-arq:DefaultGraph'))
+    def __init__(self):
+        self.g = Graph()
         self.ns = {}
 
     def bind_namespaces(self, namespaces):
@@ -45,9 +40,18 @@ class Store():
     def serialize(self, format):
         return self.g.serialize(format=format)
 
-    def update(self):
-        return self.g.update(
-            "INSERT DATA { %s }" % self.g.serialize(format='nt'))
+
+class RemoteStore():
+    def __init__(self, endpoint):
+        self._store = sparqlstore.SPARQLUpdateStore()
+        self._store.open((endpoint, endpoint))
+        self.g = Graph(self._store, URIRef('urn:x-arq:DefaultGraph'))
+
+    def update(self, triples_as_nt):
+        return self.g.update("INSERT DATA { %s }" % triples_as_nt)
+
+    def delete(self, triples_as_nt):
+        return self.g.update("DELETE DATA { %s }" % triples_as_nt)
 
 
 class Triplelizer():
@@ -55,11 +59,8 @@ class Triplelizer():
     This class takes the json output from semantics-preprocessing and generates
     triples
     '''
-    def __init__(self, endpoint=None):
-        if endpoint is None:
-            self.store = Store()
-        else:
-            self.store = Store(endpoint)
+    def __init__(self):
+        self.store = LocalStore()
         with open('configs/services.json', 'r') as fp:
             self.fingerprints = bunchify(json.loads(fp.read()))
         ontology_uris = {
@@ -213,16 +214,29 @@ class Triplelizer():
             return None
 
 
-def triplify(json_data, sparql_store):
+def triplify(json_data):
     json_data = bunchify(json_data)
-    if sparql_store is not None:
-        triple = Triplelizer(sparql_store)
-    else:
-        triple = Triplelizer()
+    triple = Triplelizer()
     triples_graph = triple.triplelize(json_data)
-
     return triples_graph
 
 
-def serialize(triples_graph):
-    return triples_graph.serialize('turtle')
+def storify(endpoint, triples_as_nt=None, triples_path='', option='INSERT'):
+    '''
+    load an existing set of triples as TURTLE ONLY
+    or just accept a set of triples already serialized as nt
+    '''
+    store = RemoteStore(endpoint)
+    if triples_path:
+        # load the triples from the path as nt
+        g = Graph()
+        g.parse(triples_path, format='turtle')
+        triples_as_nt = g.serialize(format='nt')
+
+    if triples_as_nt is None:
+        raise Exception('No triples!')
+
+    if option == 'INSERT':
+        store.update(triples_as_nt)
+    elif option == 'DELETE':
+        store.delete(triples_as_nt)

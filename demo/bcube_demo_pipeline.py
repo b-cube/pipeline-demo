@@ -7,7 +7,7 @@ from dlib.task_helpers import read_data, generate_output_filename, run_init
 from dlib.identifier import Identify
 from dlib.parser import Parser
 from dlib.process_router import Processor
-from dlib.btriples import triplify, serialize
+from dlib.btriples import triplify, storify
 
 
 '''
@@ -205,9 +205,9 @@ class TripleTask(luigi.Task):
         f = self.input().open('r')
         data = json.loads(f.read())
         new_data = self.process_response(data)
-        if new_data is not None:
+        if new_data is not None and new_data:
             with self.output().open('w') as out_file:
-                out_file.write(new_data,)
+                out_file.write(new_data)
 
     def _configure(self):
         config = parse_yaml(self.yaml_file)
@@ -216,10 +216,18 @@ class TripleTask(luigi.Task):
         self.params = config.get('params', {})
 
     def process_response(self, data):
-        graph = triplify(data, None)
-        if graph is not None:
-            graph = serialize(graph)
-        return graph
+        storage_endpoint = 'http://54.69.87.196:8080/parliament/sparql'
+
+        store = triplify(data)
+        if store is not None:
+            # write it out to turtle for the idempotent output
+            turtle = store.serialize('turtle')
+
+            # post it to parliament
+            storify(storage_endpoint, triples_as_nt=store.serialize('nt'), option='INSERT')
+
+            return turtle
+        return ''
 
 
 class MainWorkflow(luigi.Task):
