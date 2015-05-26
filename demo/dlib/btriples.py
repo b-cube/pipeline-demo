@@ -209,16 +209,15 @@ class Triplelizer():
                          Literal(self._escape_rdflib(doc_base_url)))
             # now the endpoints
             self.triplelize_endpoints(document, resource)
-            return self.store
+            return self.store, document_urn
         else:
-            return None
+            return None, None
 
 
 def triplify(json_data):
     json_data = bunchify(json_data)
     triple = Triplelizer()
-    triples_graph = triple.triplelize(json_data)
-    return triples_graph
+    return triple.triplelize(json_data)
 
 
 def storify(endpoint, triples_as_nt=None, triples_path='', option='INSERT'):

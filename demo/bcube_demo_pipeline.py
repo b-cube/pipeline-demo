@@ -204,8 +204,10 @@ class TripleTask(luigi.Task):
 
         f = self.input().open('r')
         data = json.loads(f.read())
-        new_data = self.process_response(data)
+        new_data, document_urn = self.process_response(data)
         if new_data is not None and new_data:
+            with open(self.output().path.replace('.ttl', '.txt'), 'w') as f:
+                f.write(document_urn)
             with self.output().open('w') as out_file:
                 out_file.write(new_data)
 
@@ -218,7 +220,7 @@ class TripleTask(luigi.Task):
     def process_response(self, data):
         storage_endpoint = 'http://54.69.87.196:8080/parliament/sparql'
 
-        store = triplify(data)
+        store, document_urn = triplify(data)
         if store is not None:
             # write it out to turtle for the idempotent output
             turtle = store.serialize('turtle')
@@ -226,8 +228,8 @@ class TripleTask(luigi.Task):
             # post it to parliament
             storify(storage_endpoint, triples_as_nt=store.serialize('nt'), option='INSERT')
 
-            return turtle
-        return ''
+            return turtle, document_urn
+        return '', ''
 
 
 class MainWorkflow(luigi.Task):

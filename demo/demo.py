@@ -51,19 +51,26 @@ def trigger_pipeline():
     debugs = pipeline_debug.getvalue()
     sys.stdout = std
 
-    if capture_logs:
-        # fake the generator
-        def generate():
-            for pipe in piped.split('\n'):
-                yield pipe + '\n'
-            yield '\n\n####################\n\n'
+    # if capture_logs:
+    #     # fake the generator
+    #     def generate():
+    #         for pipe in piped.split('\n'):
+    #             yield pipe + '\n'
+    #         yield '\n\n####################\n\n'
 
-            for debug in debugs.split('\n'):
-                yield debug + '\n'
+    #         for debug in debugs.split('\n'):
+    #             yield debug + '\n'
 
-        return Response(generate(), mimetype='text/plain')
-    else:
-        return ''
+    #   return Response(generate(), mimetype='text/plain')
+    # else:
+    #     return ''
+
+    def generate_urn():
+        for urn in glob.glob('bcube_demo/triples/*.txt'):
+            with open(urn, 'r') as f:
+                u = f.read().strip()
+            yield u + '\n'
+    return Response(generate_urn(), mimetype='text/plain')
 
 
 @app.route('/reset')
