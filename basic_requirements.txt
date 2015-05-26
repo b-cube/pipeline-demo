@@ -1,0 +1,39 @@
+Requirements
+
+via apt-get:
+    python-dev
+    libxml2-dev
+    libxslt-dev
+    python-lxml
+    python-bs4
+
+via pip:
+    requests
+    luigi
+    dateutil
+    rdflib
+    bunch
+
+via easy_install:
+
+```
+wget http://pyyaml.org/download/pyyaml/PyYAML-3.11.zip
+unzip PyYAML-3.11.zip
+cd PyYAML-3.11
+python setup.py install
+cd  ..
+rm -rf PyYAML-3.11
+rm -rf PyYAML-3.11.zip
+```
+
+clone the demo repo
+
+add the intermediate io directories (under demo):
+```
+mkdir bcube_demo
+mkdir bcube_demo/docs
+mkdir bcube_demo/raw
+mkdir bcube_demo/identified
+mkdir bcube_demo/parsed
+mkdir bcube_demo/triples
+```
