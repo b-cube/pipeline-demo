@@ -3,6 +3,7 @@
 import flask
 from flask import Flask
 from flask import Response
+from flask import request
 app = Flask(__name__)
 
 import luigi
@@ -20,6 +21,10 @@ def trigger_pipeline():
     '''
     run the pipeline
     '''
+    capture_logs = bool(request.args.get('debug', 'False'))
+    # Raw, Identify, Parse, Triple, Query
+    output_task = request.args.get('task', 'Triple')
+
     doc_dir = 'bcube_demo/docs'
 
     # capture the main luigi output
@@ -43,16 +48,19 @@ def trigger_pipeline():
     debugs = pipeline_debug.getvalue()
     sys.stdout = std
 
-    # fake the generator
-    def generate():
-        for pipe in piped.split('\n'):
-            yield pipe + '\n'
-        yield '\n\n####################\n\n'
+    if capture_logs:
+        # fake the generator
+        def generate():
+            for pipe in piped.split('\n'):
+                yield pipe + '\n'
+            yield '\n\n####################\n\n'
 
-        for debug in debugs.split('\n'):
-            yield debug + '\n'
+            for debug in debugs.split('\n'):
+                yield debug + '\n'
 
-    return Response(generate(), mimetype='text/plain')
+        return Response(generate(), mimetype='text/plain')
+    else:
+        return ''
 
 
 @app.route('/reset')

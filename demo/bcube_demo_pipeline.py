@@ -7,6 +7,7 @@ from dlib.task_helpers import read_data, generate_output_filename, run_init
 from dlib.identifier import Identify
 from dlib.parser import Parser
 from dlib.process_router import Processor
+from dlib.btriples import triplify
 
 
 '''
@@ -214,7 +215,8 @@ class TripleTask(luigi.Task):
         self.params = config.get('params', {})
 
     def process_response(self, data):
-        return data
+        graph = triplify(data, '')
+        return graph
 
 
 class MainWorkflow(luigi.Task):
