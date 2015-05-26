@@ -152,7 +152,7 @@ class Triplelizer():
 
             endpoint.add(wso["Protocol"], Literal(item.protocol))
             endpoint.add(wso["BaseURL"], URIRef(self._escape_rdflib(item.url)))
-            if 'mimeType' in item:
+            if 'mimeType' in item and item.mimeType is not None:
                 for mime_type in item.mimeType:
                     endpoint.add(media['type'], Literal(mime_type))
 
