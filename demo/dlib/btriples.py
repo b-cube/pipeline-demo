@@ -193,8 +193,6 @@ class Triplelizer():
             service_doc = document.get('service_description', {})
             service = service_doc.get('service', {})
 
-            # TODO: this is actually incorrect (we could have other
-            #       things!) but good enough for today Apr 14, 2015
             if not service_doc or not service:
                 return None
 
@@ -251,6 +249,7 @@ class JsonLoader():
 
 
 def triplify(json_data, sparql_store):
+    json_data = bunchify(json_data)
     if sparql_store is not None:
         triple = Triplelizer(sparql_store)
     else:
@@ -258,6 +257,10 @@ def triplify(json_data, sparql_store):
     triples_graph = triple.triplelize(json_data)
 
     return triples_graph
+
+
+def serialize(triples_graph):
+    return triples_graph.serialize('turtle')
 
 
 # def main():

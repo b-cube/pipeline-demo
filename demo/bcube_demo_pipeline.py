@@ -7,7 +7,7 @@ from dlib.task_helpers import read_data, generate_output_filename, run_init
 from dlib.identifier import Identify
 from dlib.parser import Parser
 from dlib.process_router import Processor
-from dlib.btriples import triplify
+from dlib.btriples import triplify, serialize
 
 
 '''
@@ -204,9 +204,9 @@ class TripleTask(luigi.Task):
         f = self.input().open('r')
         data = json.loads(f.read())
         new_data = self.process_response(data)
-
-        with self.output().open('w') as out_file:
-            out_file.write(json.dumps(new_data, indent=4))
+        if new_data is not None:
+            with self.output().open('w') as out_file:
+                out_file.write(json.dumps(new_data, indent=4))
 
     def _configure(self):
         config = parse_yaml(self.yaml_file)
@@ -216,6 +216,8 @@ class TripleTask(luigi.Task):
 
     def process_response(self, data):
         graph = triplify(data, '')
+        if graph is not None:
+            graph = serialize(graph)
         return graph
 
 
