@@ -65,7 +65,8 @@ class RawTask(luigi.Task):
             "content": content,
             "url": url,
             "sha": sha,
-            "harvest": harvest
+            "harvest": harvest,
+            "digest": data.get("digest")
         }
 
     def _configure(self):
@@ -206,7 +207,7 @@ class TripleTask(luigi.Task):
         new_data = self.process_response(data)
         if new_data is not None:
             with self.output().open('w') as out_file:
-                out_file.write(json.dumps(new_data, indent=4))
+                out_file.write(new_data,)
 
     def _configure(self):
         config = parse_yaml(self.yaml_file)

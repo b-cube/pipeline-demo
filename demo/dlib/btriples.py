@@ -4,20 +4,9 @@ from rdflib import Graph, Literal, RDF, RDFS, Namespace, URIRef
 from rdflib.namespace import DCTERMS
 from rdflib.plugins.stores import sparqlstore
 from bunch import bunchify
-# from optparse import OptionParser
-import os
 import hashlib
 import json
-# import logging
-import glob
-# import sys
 from uuid import uuid4
-
-# logging.basicConfig(filename="triples.log", level=logging.DEBUG)
-# logger = logging.getLogger(__name__)
-
-# __location__ = os.path.realpath(
-#                os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 class Store():
@@ -71,7 +60,6 @@ class Triplelizer():
             self.store = Store()
         else:
             self.store = Store(endpoint)
-        # with open(__location__ + '/services.json', 'r') as fp:
         with open('configs/services.json', 'r') as fp:
             self.fingerprints = bunchify(json.loads(fp.read()))
         ontology_uris = {
@@ -143,10 +131,10 @@ class Triplelizer():
             if self._validate(param.name) is not None:
                 p.add(param_ns['serviceParameterName'],
                       Literal(param.name))
-            if self._validate(param.formats) is not None:
+            if 'formats' in param and self._validate(param.formats) is not None:
                 p.add(param_ns['serviceParameterFormat'],
                       Literal(param.formats))
-            if self._validate(param.type) is not None:
+            if 'type' in param and self._validate(param.type) is not None:
                 p.add(param_ns['serviceParameterType'],
                       Literal(param.type))
             endpoint.add(param_ns['hasParameters'], p)
@@ -172,7 +160,7 @@ class Triplelizer():
             if doc.identity.subtype == "service":
                 endpoint.add(RDF.type, wso["ServiceEndpoint"])
                 endpoint.add(wso["hasService"], service)
-                if item.parameters is not None:
+                if 'parameters' in item and item.parameters is not None:
                     self.triplelize_parameters(item.parameters,
                                                endpoint, doc.digest)
             else:
@@ -207,8 +195,6 @@ class Triplelizer():
 
             resource = self.store.get_resource(document_urn)
 
-            print doc_type, doc_ontology
-
             resource.add(RDF.type, URIRef(doc_type))
             resource.add(RDF.type, wso[doc_ontology])
             resource.add(DCTERMS.hasVersion, Literal(doc_version))
@@ -228,31 +214,6 @@ class Triplelizer():
             return None
 
 
-# class JsonLoader():
-#     '''
-#     '''
-#     def __init__(self, path):
-#         self.path = path
-
-#     def load(self):
-#         # generator for the files (whether path or not)
-#         if os.path.isdir(self.path):
-#             files = glob.glob(os.path.join(self.path, '*.json'))
-#             for f in files:
-#                 yield f
-#         elif os.path.isfile(self.path):
-#             yield self.path
-
-#     def parse(self, j_file):
-#         try:
-#             with open(j_file) as json_file:
-#                 data = json.load(json_file)
-#                 return bunchify(data)
-#         except:
-#             # logger.error(" Loading: " + j_file)
-#             return None
-
-
 def triplify(json_data, sparql_store):
     json_data = bunchify(json_data)
     if sparql_store is not None:
@@ -266,33 +227,3 @@ def triplify(json_data, sparql_store):
 
 def serialize(triples_graph):
     return triples_graph.serialize('turtle')
-
-
-# def main():
-#     p = OptionParser()
-#     p.add_option("--path", "-p")
-#     p.add_option("--format", "-f", default="turtle")
-#     p.add_option("--sparql", "-s", default=None)
-#     options, arguments = p.parse_args()
-
-#     if not options.path:
-#         p.error('Missing a valid path')
-
-#     loader = JsonLoader(options.path)
-#     for j_file in loader.load():
-#         json_data = loader.parse(j_file)
-
-#         if not json_data:
-#             logger.debug('Failed to load {0}'.format(j_file))
-#             continue
-
-#         triples_graph = triplify(json_data, options.sparql)
-
-#         if triples_graph is not None:
-#             # TODO: pipe stdout for command composition
-#             sys.stdout.write(triples_graph.serialize(options.format))
-#         else:
-#             logger.error(" Triples creation failed for: " + j_file)
-
-# if __name__ == '__main__':
-#     main()
