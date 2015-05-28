@@ -24,10 +24,6 @@ def trigger_pipeline():
     '''
     run the pipeline
     '''
-    capture_logs = bool(request.args.get('debug', 'False'))
-    # Raw, Identify, Parse, Triple, Query
-    output_task = request.args.get('task', 'Triple')
-
     doc_dir = 'bcube_demo/docs'
 
     # capture the main luigi output
@@ -51,19 +47,16 @@ def trigger_pipeline():
     debugs = pipeline_debug.getvalue()
     sys.stdout = std
 
-    # if capture_logs:
-    #     # fake the generator
-    #     def generate():
-    #         for pipe in piped.split('\n'):
-    #             yield pipe + '\n'
-    #         yield '\n\n####################\n\n'
+    # # fake the generator
+    # def generate():
+    #     for pipe in piped.split('\n'):
+    #         yield pipe + '\n'
+    #     yield '\n\n####################\n\n'
 
-    #         for debug in debugs.split('\n'):
-    #             yield debug + '\n'
+    #     for debug in debugs.split('\n'):
+    #         yield debug + '\n'
 
-    #   return Response(generate(), mimetype='text/plain')
-    # else:
-    #     return ''
+    # return Response(generate(), mimetype='text/plain')
 
     def generate_urn():
         for urn in glob.glob('bcube_demo/triples/*.txt'):
@@ -77,7 +70,6 @@ def trigger_pipeline():
 def reset():
     '''
     reset the pipeline (delete the intermediate files)
-    TODO: drop from parliament?!
     '''
     # TODO: remove the TRIPLES acting on EACH file first.
     endpoint = 'http://54.69.87.196:8080/parliament/sparql'

@@ -6,6 +6,7 @@ Raw:
 Identify:
   identifiers:
     - configs/opensearch_identifier.yaml
+    - configs/ogc_identifier.yaml
 
   output_directory: 'bcube_demo/identified'
 

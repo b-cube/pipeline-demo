@@ -129,7 +129,7 @@ class Triplelizer():
             p = self.store.get_resource(parameter_urn)
 
             p.add(RDF.type, URIRef("ServiceParameter:ServiceParameter"))
-            if self._validate(param.name) is not None:
+            if 'name' in param and self._validate(param.name) is not None:
                 p.add(param_ns['serviceParameterName'],
                       Literal(param.name))
             if 'formats' in param and self._validate(param.formats) is not None:
